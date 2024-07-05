@@ -12,17 +12,15 @@ This project demonstrates an event-driven integration solution using microservic
 
   - **Triggers**: HTTP triggers for registration and email verification.
   - **Database**: Stores confidential user data in Cosmos DB.
-  - **Event Publishing**: Publishes `UserCreated` and `UserRegistered` events.
+  - **Event Publishing**: Publishes `VerifyMail` and `VerifiedMail` events.
 
 - **User Service**: Manages user profile information.
 
-  - **Event Subscription**: Subscribes to `UserRegistered` event to store non-confidential user data.
-  - **Event Subscription**: Subscribes to `UserUpdated` event to update non-confidential user data.
-  - **Event Subscription**: Subscribes to `UserDeleted` event to delete user data.
+  - **Event Subscription**: Subscribes to `VerifiedMail` topic and `UserCreatedEvent` event to store non-confidential user data.
 
 - **Mail Service**: Sends verification and welcome emails.
-  - **Event Subscription**: Subscribes to `UserCreated` event to send a verification mail.
-  - **Event Subscription**: Subscribes to `UserRegistered` event to send a welcome mail.
+  - **Event Subscription**: Subscribes to `VerifyMail` topic and `MailVerifyEvent` event to send a verification mail.
+  - **Event Subscription**: Subscribes to `VerifiedMail` topic and `WelcomeMailEvent` event to send a verification mail.
 
 ### Workflow
 
@@ -30,16 +28,16 @@ This project demonstrates an event-driven integration solution using microservic
 
    - User registers via `AuthRegister` HTTP trigger in Authentication Service.
    - Confidential data (e.g., ID, Username, Email, PasswordHash) is stored in the Auth Cosmos DB.
-   - `UserCreated` event is published.
+   - `VerifyMail` is published.
 
 2. **Email Verification**
 
-   - Mail Service's `UserCreatedMailTrigger` sends a verification email with a link.
-   - User clicks the link, triggering `VerifyMail` HTTP trigger in Authentication Service.
-   - Upon verification, `UserRegistered` event is published.
+   - Mail Service's `VerificationMailTrigger` sends a verification email with a link.
+   - User clicks the link, triggering `VerifyEmail` HTTP trigger in Authentication Service.
+   - Upon verification, `VerifiedMail` event is published.
 
 3. **User Data Handling**
-   - Mail Service's `UserRegisteredMailTrigger` sends a welcome email.
+   - Mail Service's `WelcomeMailTrigger` sends a welcome email.
    - User Service's `UserCreatedTrigger` stores non-confidential data in the User Cosmos DB.
 
 ## Setup Instructions
@@ -57,14 +55,12 @@ This project demonstrates an event-driven integration solution using microservic
    1. `Auth` database and `UserCredentials` container for Authentication Service.
    2. `Users` database and `ProfileData` container for User Service.
 2. **Azure Event Grid**: Configure the Event Grid topics to publish and subscribe to events:
-   1. `UserCreated` topic and add `UserCreatedMailEvent` as event subscriber. Then add the Azure Function `UserCreatedMailTrigger` as it's subscriber.
-   2. `UserRegistered` topic and add `UserRegisteredMailEvent` and `UserRegisteredUserEvent` as event subscribers. Then add the Azure Functions `UserRegisteredMailTrigger` and `UserRegisteredUserTrigger` as it's subscribers.
-   3. `UserUpdated` topic and add `UserUpdatedUserEvent` as event subscriber. Then add the Azure Function `UserUpdatedUserTrigger` as it's subscriber.
-   4. `UserDeleted` topic and add `UserDeletedEvent` as event subscriber. Then add the Azure Function `UserDeletedTrigger` as it's subscriber.
+   1. Add the`VerifyMail` topic and add `VerifyMailEvent` as event subscriber. Then add the Azure Function `VerificationMailTrigger` as it's subscriber.
+   2. Add the `VerifiedMail` topic and add `WelcomeMailEvent` and `UserCreatedEvent` as event subscribers. Then add the Azure Functions `WelcomeMailTrigger` and `UserCreatedTrigger` as it's subscribers.
 3. **Azure Functions**: Deploy functions for each service.
-   1. `AuthFunctions`
-   2. `MailFunctions`
-   3. `UserFunctions`
+   1. `AuthService`
+   2. `MailService`
+   3. `UserService`
 4. **Azure Communication Services**: Set up a Communication Services resource for sending emails.
    1. It is possible to use e-mail or sms with Azure Communication Services. This project uses Azures e-mail service, as it is free.
 
