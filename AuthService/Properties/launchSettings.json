@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "AuthService": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7200",
+      "launchBrowser": false
+    }
+  }
+}
