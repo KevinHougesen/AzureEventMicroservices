@@ -1,99 +1,40 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Nyt - Welcome</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Lobster+Two:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        background-color: #000000;
-        color: #ffffff;
-        margin: 0;
-        font-family: "Montserrat", sans-serif;
-        text-align: center;
-      }
-      .container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-      h1 {
-        font-family: "Lobster Two", cursive;
-        color: #e03e2d;
-        font-size: 42px;
-        margin: 0;
-      }
-      .flag {
-        margin: 20px 0;
-      }
-      .flag img {
-        width: 100px;
-        height: auto;
-      }
-      .message {
-        margin: 20px 0;
-        font-size: 24px;
-      }
-      .message p {
-        margin: 5px 0;
-      }
-      .p-gray {
-        color: #95a5a6;
-        font-family: "Montserrat", sans-serif;
-        font-size: 14px;
-      }
-      .p-white {
-        color: #ffffff;
-        font-family: "Montserrat", sans-serif;
-        font-size: 14px;
-      }
-      .p-bold {
-        color: #ffffff;
-        font-family: "Montserrat", sans-serif;
-        font-weight: 700;
-        font-size: 24px;
-      }
-      .cta {
-        margin: 20px 0;
-        font-size: 18px;
-      }
-      .cta button {
-        background-color: #e03e2d;
-        color: #ffffff;
-        border: none;
-        padding: 15px 30px;
-        font-size: 16px;
-        cursor: pointer;
-        border-radius: 5px;
-        transition: background-color 0.3s;
-      }
-      .cta button:hover {
-        background-color: #c32b1c;
-      }
-    </style>
+      <style>
+          /* Define your CSS styles here */
+          body {
+              font-family: Arial, sans-serif;
+              background-color: #f9f9f9;
+              margin: 0;
+              padding: 0;
+          }
+          .container {
+              max-width: 600px;
+              margin: 20px auto;
+              padding: 20px;
+              background-color: #fff;
+              border-radius: 5px;
+              box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          }
+          h1 {
+              color: #333;
+          }
+          p {
+              color: #666;
+          }
+          .btn {
+              display: inline-block;
+              padding: 10px 20px;
+              background-color: #007bff;
+              color: #fff;
+              text-decoration: none;
+              border-radius: 5px;
+          }
+      </style>
   </head>
   <body>
-    <div class="container">
-      <h1>Nyt</h1>
-      <div class="flag">
-        <img
-          src="https://image.spreadshirtmedia.net/image-server/v1/compositions/T949A2PA2009PT25X7Y6D185435921W4417H5890/views/3,width=550,height=550,appearanceId=2,backgroundColor=000000,noPt=true/denmark-flag-fingerprint-national-colors-mug.jpg"
-          alt="Flag Placeholder"
-        />
-      </div>
-      <div class="message">
-        <p class="p-gray">DER ER NYT!</p>
-        <p class="p-bold">Saml, del, skab nyt.</p>
-        <p class="p-gray">Velkommen til Nyt!</p>
-        <p class="p-gray">Bliv en del af fællesskabet.</p>
-      </div>
-      <div class="cta">
+      <div class='container'>
         <p class="p-white">Opret din bruger nu</p>
         <a href="{verificationLink}" class="p-white"><button>Verificer</button></a>
       </div>
