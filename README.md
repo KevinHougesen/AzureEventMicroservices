@@ -4,7 +4,7 @@
 
 This project demonstrates an event-driven integration solution using microservices architecture in C# with Azure tools. The solution comprises three microservices: Authentication Service, User Service, and Mail Service. The system leverages Cosmos DB for storage, Azure Event Grid for event handling, Azure Functions for serverless computing, and Azure Communication Services for sending emails.
 
-![EDAMS](https://github.com/KevinHougesen/NytAzureFunctions/assets/83435086/3738984e-6271-4e85-a8b9-7043fda8ec3d)
+![EDAMSAZ](https://github.com/KevinHougesen/AzureEventMicroservices/assets/83435086/fd650b8f-df75-4ac9-ac0c-569b71d36027)
 
 ### Microservices Breakdown
 
