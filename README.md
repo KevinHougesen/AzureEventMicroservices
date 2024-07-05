@@ -62,7 +62,7 @@ This project demonstrates an event-driven integration solution using microservic
    2. `MailService`
    3. `UserService`
 4. **Azure Communication Services**: Set up a Communication Services resource for sending emails.
-   1. It is possible to use e-mail or sms with Azure Communication Services. This project uses Azures e-mail service, as it is free.
+   1. It is possible to use e-mail or sms with Azure Communication Services. This project uses Azures e-mail service, as it's free.
 
 ### Configuration
 
