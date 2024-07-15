@@ -68,6 +68,6 @@ This project demonstrates an event-driven integration solution using microservic
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/KevinHougesen/AzureEventMicroservices.git
-   cd AzureEventMicroservices
+   git clone https://github.com/KevinHougesen/SignUpMailVerification.git
+   cd SignUpMailVerification
    ```
