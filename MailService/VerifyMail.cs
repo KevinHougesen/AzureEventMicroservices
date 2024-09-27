@@ -8,7 +8,7 @@ using Data.Models;
 using Azure;
 using Azure.Messaging.EventGrid;
 
-namespace Nyt.UserFunction
+namespace NytHybrid;
 {
     public class VerifyEmail
     {
@@ -30,12 +30,15 @@ namespace Nyt.UserFunction
             // Read query parameters
             string token = req.Query["token"];
             string userId = req.Query["userId"];
-            string userName = req.Query["username"];
             string userEmail = req.Query["email"];
-            string location = req.Query["location"];
-            string occupation = req.Query["occupation"];
 
-            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userEmail))
+            string requestBody;
+            using (var reader = new StreamReader(req.Body))
+            {
+                requestBody = await reader.ReadToEndAsync();
+            }
+
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userEmail))
             {
                 _logger.LogWarning("Missing required query parameters.");
                 return new BadRequestObjectResult("Missing required query parameters.");
@@ -43,12 +46,14 @@ namespace Nyt.UserFunction
 
             _logger.LogInformation($"Received email verification request for user ID: {userId}");
 
-            var container = _cosmosClient.GetContainer(_config["AUTH_DATABASE"], _config["AUTH_CONTAINER"]);
+            // Save to Cosmos DB
+            UserModel user;
+            var container = _cosmosClient.GetContainer(_config["MAIL_DATABASE"], _config["MAIL_CONTAINER"]);
 
             try
             {
-                var response = await container.ReadItemAsync<AuthModel>(userId, new PartitionKey(userId));
-                var auth = response.Resource;
+                user = JsonConvert.DeserializeObject<UserModel>(requestBody);
+
 
                 // Compare tokens, handle any encoding differences
                 if (Uri.EscapeDataString(auth.EmailVerificationToken) == Uri.EscapeDataString(token))
@@ -63,14 +68,7 @@ namespace Nyt.UserFunction
                     // Prepare mail event data
                     var mailEvent = new EventModel
                     {
-                        User = new UserModel
-                        {
-                            Id = userId,
-                            Username = userName,
-                            Email = userEmail,
-                            Location = location,
-                            Occupation = occupation
-                        }
+                        User = user;
                     };
 
                     await PublishMailVerifiedEvent(mailEvent);

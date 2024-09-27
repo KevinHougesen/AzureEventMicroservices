@@ -39,7 +39,7 @@ namespace Mail.Trigger
                     var verificationUrl = _config["VerificationUrl"];
                     var token = data.Mail.EmailVerificationToken;
                     var userId = data.User.Id;
-                    var user = data.User;
+                    var mail = data.Mail;
 
                     // Ensure that the verification URL was retrieved correctly 
                     if (string.IsNullOrEmpty(verificationUrl))
@@ -49,7 +49,7 @@ namespace Mail.Trigger
                     }
 
                     // Construct verification link
-                    var verificationLink = $"{verificationUrl}?token={Uri.EscapeDataString(token)}&userId={Uri.EscapeDataString(userId)}&email={Uri.EscapeDataString(user.Email)}&username={Uri.EscapeDataString(user.Username)}&displayname={Uri.EscapeDataString(user.DisplayName)}&location={Uri.EscapeDataString(user.Location)}&occupation={Uri.EscapeDataString(user.Occupation)}";
+                    var verificationLink = $"{verificationUrl}?token={Uri.EscapeDataString(token)}&userId={Uri.EscapeDataString(userId)}&email={Uri.EscapeDataString(mail)}}";
 
                     // Send email using ACS
                     await SendEmailAsync(data, verificationLink);
