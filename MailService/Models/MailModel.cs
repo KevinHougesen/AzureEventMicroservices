@@ -6,6 +6,7 @@ public class MailModel
     public string Email { get; set; }
     public string? EmailVerificationToken { get; set; }
     public DateTime? EmailVerifiedAt { get; set; }
+    public bool? Advertisements { get; set; }
 
 }
 
