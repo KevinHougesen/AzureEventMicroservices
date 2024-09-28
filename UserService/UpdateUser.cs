@@ -1,3 +1,4 @@
+/*
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
@@ -75,6 +76,7 @@ namespace Nyt.UserFunction
             await eventGridClient.SendEventAsync(userUpdatedEvent);
         }
 
-        */
+        *\
     }
 }
+*/

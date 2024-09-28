@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Threading.Tasks;
 using Azure.Communication.Email;
@@ -63,3 +64,4 @@ namespace Mail.Trigger
 
     }
 }
+*/
