@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthService", "AuthService\AuthService.csproj", "{C3493600-376D-404B-A61C-5FB591B1961C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthService", "AuthService\AuthService.csproj", "{A3493600-376D-404B-A61C-5FB591B1961C}"
+EndProject
+Project("{8A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MailService", "MailService\MailService.csproj", "{B3493600-376D-404B-A61C-5FB591B1961C}"
+EndProject
+Project("{7A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserService", "UserService\UserService.csproj", "{C3493600-376D-404B-A61C-5FB591B1961C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

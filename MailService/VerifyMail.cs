@@ -9,7 +9,6 @@ using Azure;
 using Azure.Messaging.EventGrid;
 
 namespace NytHybrid;
-{
     public class VerifyEmail
     {
         private readonly ILogger<VerifyEmail> _logger;
@@ -47,31 +46,26 @@ namespace NytHybrid;
             _logger.LogInformation($"Received email verification request for user ID: {userId}");
 
             // Save to Cosmos DB
-            UserModel user;
+            MailModel mail = new();
             var container = _cosmosClient.GetContainer(_config["MAIL_DATABASE"], _config["MAIL_CONTAINER"]);
 
             try
             {
-                user = JsonConvert.DeserializeObject<UserModel>(requestBody);
+                mail.Id = userId;
+                mail.Email = userEmail;
+                mail.EmailVerifiedAt = DateTime.UtcNow;
 
 
                 // Compare tokens, handle any encoding differences
-                if (Uri.EscapeDataString(auth.EmailVerificationToken) == Uri.EscapeDataString(token))
+                if (Uri.EscapeDataString(mail.EmailVerificationToken) == Uri.EscapeDataString(token))
                 {
-                    auth.EmailVerifiedAt = DateTime.UtcNow;
-                    auth.EmailVerificationToken = null; // Clear the token after verification
+                    mail.EmailVerificationToken = null; // Clear the token after verification
 
-                    await container.ReplaceItemAsync(auth, auth.Id, new PartitionKey(userId));
+                    await container.ReplaceItemAsync(mail, mail.Id, new PartitionKey(userId));
 
-                    _logger.LogInformation($"User {auth.Username} verified successfully.");
+                    _logger.LogInformation($"Email {mail.Email} verified successfully.");
 
-                    // Prepare mail event data
-                    var mailEvent = new EventModel
-                    {
-                        User = user;
-                    };
-
-                    await PublishMailVerifiedEvent(mailEvent);
+                    await PublishMailVerifiedEvent(mail);
 
                     return new OkObjectResult("Email verified successfully.");
                 }
@@ -93,14 +87,14 @@ namespace NytHybrid;
             }
         }
 
-        private async Task PublishMailVerifiedEvent(EventModel data)
+        private async Task PublishMailVerifiedEvent(MailModel data)
         {
             var credential = new AzureKeyCredential(_config["VERIFIED_MAIL_EVENT_GRID_KEY"]);
             var eventGridClient = new EventGridPublisherClient(
                 new Uri(_config["VERIFIED_MAIL_EVENT_GRID_TOPIC_ENDPOINT"]), credential);
 
             var mailVerifiedEvent = new EventGridEvent(
-                subject: $"users/{data.User.Id}",
+                subject: $"users/{data.Id}",
                 eventType: "Mail.Verified",
                 dataVersion: "1.0",
                 data: data);
@@ -108,4 +102,3 @@ namespace NytHybrid;
             await eventGridClient.SendEventAsync(mailVerifiedEvent);
         }
     }
-}

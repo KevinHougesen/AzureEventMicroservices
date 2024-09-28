@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using System.Threading.Tasks;
 using Azure.Communication.Email;
 using Azure.Messaging.EventGrid;
@@ -38,8 +38,7 @@ namespace Mail.Trigger
                     var data = JsonConvert.DeserializeObject<EventModel>(dataString);
                     var user = data.User;
                     // Save user to Cosmos DB
-                    var container = _cosmosClient.GetContainer(_config["USER_DATABASE"], _config["USER_CONTAINER"]);
-                    await container.CreateItemAsync(user);
+                    
 
                 }
 
@@ -58,3 +57,4 @@ namespace Mail.Trigger
 
     }
 }
+*/

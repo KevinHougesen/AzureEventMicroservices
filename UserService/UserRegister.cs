@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Azure;
 using Azure.Messaging.EventGrid;
+using Auth;
 
 namespace User.Http
 {
@@ -17,14 +18,12 @@ namespace User.Http
         private readonly ILogger<UserRegister> _logger;
         private readonly CosmosClient _cosmosClient;
         private readonly IConfiguration _config;
-        private readonly TokenService _tokenService;
 
         public UserRegister(ILogger<UserRegister> logger, CosmosClient cosmosClient, IConfiguration config)
         {
             _logger = logger;
             _cosmosClient = cosmosClient;
             _config = config;
-            _tokenService = new TokenService(config);
         }
 
         [Function("UserRegister")]
@@ -35,14 +34,15 @@ namespace User.Http
             string token = req.Query["token"];
             string userId = req.Query["userId"];
             string userEmail = req.Query["email"];
-            string password = req.Query["password"];
+
+            string requestBody;
+            using (var reader = new StreamReader(req.Body))
+            {
+                requestBody = await reader.ReadToEndAsync();
+            }
+
 
             EventModel mailEvent = new();
-
-            if (string.IsNullOrEmpty(requestBody))
-            {
-                return new BadRequestObjectResult("Request body is empty.");
-            }
 
             AuthModel auth;
             UserModel user;
@@ -50,7 +50,7 @@ namespace User.Http
             try
             {
                 auth = JsonConvert.DeserializeObject<AuthModel>(requestBody);
-                mail = JsonConvert.DeserializeObject<MailModel>(requestBody);
+                user = JsonConvert.DeserializeObject<UserModel>(requestBody);
             }
             catch (JsonException)
             {
@@ -58,13 +58,18 @@ namespace User.Http
             }
 
             // Hash the password
-            auth.PasswordHash = AuthUtils.HashPassword(password);
+            auth.PasswordHash = AuthUtils.HashPassword(auth.PasswordHash);
+            
 
             try
             {
+                var authContainer = _cosmosClient.GetContainer(_config["AUTH_DATABASE"], _config["AUTH_CONTAINER"]);
+                await authContainer.ReplaceItemAsync(auth, auth.Id, new PartitionKey(userId));
                 // Publish UserCreated event to Azure Event Grid
-                await PublishMailVerifiedEvent(mailEvent);
-                await PublishMailVerifyEvent(mailEvent, auth.Id);
+                //await PublishMailVerifiedEvent(mailEvent);
+                var container = _cosmosClient.GetContainer(_config["USER_DATABASE"], _config["USER_CONTAINER"]);
+                await container.CreateItemAsync(user);
+                await PublishMailVerifyEvent(mailEvent);
             }
             catch (Exception ex)
             {
@@ -72,10 +77,7 @@ namespace User.Http
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
 
-            // Generate access token
-            var accessToken = _tokenService.GenerateAccessToken(auth.Id, auth.Email);
-
-            return new OkObjectResult(new { AccessToken = accessToken});
+            return new OkObjectResult("Mail verification event published successfully.");
         }
 
         private string GenerateEmailVerificationToken()
@@ -88,14 +90,14 @@ namespace User.Http
             }
         }
 
-        private async Task PublishMailVerifyEvent(EventModel data, string id)
+        private async Task PublishMailVerifyEvent(EventModel data)
         {
             var credential = new AzureKeyCredential(_config["VERIFY_MAIL_EVENT_GRID_KEY"]);
             var eventGridClient = new EventGridPublisherClient(
                 new Uri(_config["VERIFY_MAIL_EVENT_GRID_TOPIC_ENDPOINT"]), credential);
 
             var mailVerifyEvent = new EventGridEvent(
-                subject: $"Users/{auth.Id}",
+                subject: $"Users/{data.User.Id}",
                 eventType: "Mail.Verify",
                 dataVersion: "1.0",
                 data: data);
