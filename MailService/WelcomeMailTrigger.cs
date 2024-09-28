@@ -42,7 +42,7 @@ namespace Mail.Trigger
                     }
 
                     // Construct verification link
-                    var verificationLink = $"https://google.com/";
+                    var verificationLink = $"nythybrid://app/registeruser";
 
                     // Send email using ACS
                     await SendEmailAsync(data, verificationLink);

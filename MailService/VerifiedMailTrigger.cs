@@ -1,30 +1,25 @@
-using System;
 using System.Text;
-using System.IO;
-using System.Threading.Tasks;
 using Azure.Communication.Email;
-using Azure.Messaging.EventGrid;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Data.Models;
 using Azure;
 
 namespace Mail.Trigger
 {
-    public class VerificationMailTrigger
+    public class VerifiedMailTrigger
     {
-        private readonly ILogger<VerificationMailTrigger> _logger;
+        private readonly ILogger<VerifiedMailTrigger> _logger;
         private readonly IConfiguration _config;
 
-        public VerificationMailTrigger(ILogger<VerificationMailTrigger> logger, IConfiguration config)
+        public VerifiedMailTrigger(ILogger<VerifiedMailTrigger> logger, IConfiguration config)
         {
             _logger = logger;
             _config = config;
         }
 
-        [Function(nameof(VerificationMailTrigger))]
+        [Function(nameof(VerifiedMailTrigger))]
         public async Task RunAsync([EventGridTrigger] MailEventType eventGridEvent)
         {
             try
@@ -33,15 +28,13 @@ namespace Mail.Trigger
                 {
                     _logger.LogInformation("Received CloudEvent. Type: {type}, Subject: {subject}", eventGridEvent.EventType, eventGridEvent.Subject);
 
-                    var dataString = JsonConvert.SerializeObject(eventGridEvent.Data);
-                    var data = JsonConvert.DeserializeObject<EventModel>(dataString);
+                    EventModel mailEvent = new();
 
-                    var verificationUrl = "/verify";
-                    var token = data.Mail.EmailVerificationToken;
-                    var userId = data.User.Id;
-                    var mail = data.Mail.Email;
+                    var data = eventGridEvent.Data;
 
-                    // Ensure that the verification URL was retrieved correctly 
+                    var verificationUrl = _config["VerificationUrl"];
+
+                    // Ensure that the verification URL was retrieved correctly
                     if (string.IsNullOrEmpty(verificationUrl))
                     {
                         _logger.LogError("VerificationUrl configuration is missing or empty.");
@@ -49,10 +42,11 @@ namespace Mail.Trigger
                     }
 
                     // Construct verification link
-                    var verificationLink = $"{verificationUrl}?token={Uri.EscapeDataString(token)}&userId={Uri.EscapeDataString(userId)}&email={Uri.EscapeDataString(mail)}";
+                    var verificationLink = $"https://google.com/";
 
                     // Send email using ACS
                     await SendEmailAsync(data, verificationLink);
+
                 }
                 else
                 {
@@ -81,7 +75,7 @@ namespace Mail.Trigger
             var emailClient = new EmailClient(connectionString);
 
             // Read the HTML template from the file
-            var filePath = Path.Combine(AppContext.BaseDirectory, "VerificationEmailTemplate.html");
+            var filePath = Path.Combine(AppContext.BaseDirectory, "VerifiedTemplate.html");
             string emailTemplate;
 
             try
@@ -98,7 +92,7 @@ namespace Mail.Trigger
             var emailContentHtml = emailTemplate
                 .Replace("{verificationLink}", verificationLink);
 
-            var emailContent = new EmailContent("Verification")
+            var emailContent = new EmailContent("Welcome to [Service]")
             {
                 Html = emailContentHtml
             };
@@ -120,5 +114,6 @@ namespace Mail.Trigger
                 throw; // Rethrow exception to mark function invocation as failed
             }
         }
+
     }
 }
